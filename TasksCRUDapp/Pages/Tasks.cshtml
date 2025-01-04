@@ -1,6 +1,7 @@
 ﻿@page
 @model TasksCRUDapp.Pages.TasksModel
 @using Microsoft.Data.SqlClient
+@using System.Text
 
 @{
 
@@ -9,34 +10,78 @@
     // Variables
     List<dynamic> tasks = new List<dynamic>();
 
+    StringBuilder htmlBuilder = new StringBuilder();
+
+
 
 
     // Fetch tasks from database
     try
     {
+
         using (SqlConnection connection = new SqlConnection(TasksModel.connectionString))
         {
             connection.Open();
             string query = "SELECT * FROM Tasks";
             SqlCommand command = new SqlCommand(query, connection);
-            DateTime taskdate;
+
             using (SqlDataReader reader = command.ExecuteReader())
             {
+                htmlBuilder.Append("<table border='1'>");
+                htmlBuilder.Append("<tr><th>Id</th><th>Description</th><th>Date</th><th style=\"width:6vw;text-align: center;\">Complete</th> <th style=\"width:6vw;text-align: center;\">Actions</th></tr>");
+
                 while (reader.Read())
                 {
-                    taskdate = (DateTime)reader["date"];                    
-                    
-                    tasks.Add(new {
-                        Id = reader["Id"],
-                        Description = reader["description"],
-                        Date = taskdate.ToString("yyyy-MM-dd"),
-                        Complete = reader["is_complete"]
-                    });
-                
-                
+                    DateTime taskDate = (DateTime)reader["date"];
+
+                    htmlBuilder.Append("<tr>");
+                    htmlBuilder.AppendFormat("<td>{0}</td>", reader["Id"]);
+                    htmlBuilder.AppendFormat("<td>{0}</td>", reader["description"]);
+                    htmlBuilder.AppendFormat("<td>{0}</td>", taskDate.ToString("yyyy-MM-dd"));
+                    htmlBuilder.AppendFormat("<td>{0}</td>", reader["is_complete"]);
+                    htmlBuilder.AppendFormat("<td><form method=\"post\"><input type=\"checkbox\" name=\"complete\" {0} disabled/> </form> </td>", ((bool)reader["is_complete"] ? "checked" : ""));
+                    htmlBuilder.AppendFormat("<td><form method=\"post\"> <input type=\"hidden\" name=\"id\" value=\"{0} \" /><button type=\"submit\" name=\"action\" value=\"delete\">Delete</button></form> </td>", reader["Id"]);
+
+     
+            // <!--action column -->
+            // <td style="text-align: center;">
+            //     <form method="post">
+            //        <input type="hidden" name="id" value="@task.Id" />
+            //        @*  
+            //         <input type="text" name="description" value="@task.Description" />
+            //         <input type="date" name="date" value="@task.Date" />
+            //         <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") /> 
+            //        <button type="submit" name="action" value="update">Update</button> *@
+            //         <button type="submit" name="action" value="delete">Delete</button>
+            //     </form>
+                    htmlBuilder.Append("</tr>");
                 }
+
+                htmlBuilder.Append("</table>");
             }
         }
+        // using (SqlConnection connection = new SqlConnection(TasksModel.connectionString))
+        // {
+        //     connection.Open();
+        //     string query = "SELECT * FROM Tasks";
+        //     SqlCommand command = new SqlCommand(query, connection);
+        //     DateTime taskdate;
+        //     using (SqlDataReader reader = command.ExecuteReader())
+        //     {
+        //         while (reader.Read())
+        //         {
+        //             taskdate = (DateTime)reader["date"];
+        //             tasks.Add(new {
+        //                 Id = reader["Id"],
+        //                 Description = reader["description"],
+        //                 Date = taskdate.ToString("yyyy-MM-dd"),
+        //                 Complete = reader["is_complete"]
+        //             });
+                
+                
+        //         }
+        //     }
+        // }
     }
     catch (Exception ex)
     {
@@ -57,15 +102,17 @@
 }
 
 <!-- Task List -->
-<table border="1">
+
+@Html.Raw(htmlBuilder);
+@* <table border="1">
     <tr>
         <th style="width:4vw;">ID</th>
         <th style="width:9vw;">Description</th>
         <th style ="width:6vw;">Date</th>
         <th style="width:6vw;text-align: center;">Complete</th>
         <th style="width:6vw;text-align: center;">Actions</th>
-    </tr>
-    @foreach (var task in tasks)
+    </tr> *@
+   @*  @foreach (var task in tasks)
     {
         DateTime taskDate = DateTime.Parse(task.Date);
         <tr>
@@ -73,7 +120,7 @@
             <td>@task.Description</td>
             <td>@taskDate.ToShortDateString()</td>
             <td style="text-align: center;">
-                @* @task.Complete *@
+                @* @task.Complete
                 <form method="post">
                     <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") disabled/>
                 </form>
@@ -82,18 +129,18 @@
             <td style="text-align: center;">
                 <form method="post">
                    <input type="hidden" name="id" value="@task.Id" />
-                   @*  
+                    
                     <input type="text" name="description" value="@task.Description" />
                     <input type="date" name="date" value="@task.Date" />
                     <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") /> 
-                   <button type="submit" name="action" value="update">Update</button> *@
+                   <button type="submit" name="action" value="update">Update</button> 
                     <button type="submit" name="action" value="delete">Delete</button>
                 </form>
             </td>
         </tr>
     
     }
-</table>
+</table> *@
 
 <!-- Add Task Form -->
 <h2>Add New Task</h2>
