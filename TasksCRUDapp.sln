@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TasksCRUDapp", "TasksCRUDapp\TasksCRUDapp.csproj", "{EFD70582-2213-4812-8554-3FD540AD496B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EFD70582-2213-4812-8554-3FD540AD496B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFD70582-2213-4812-8554-3FD540AD496B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFD70582-2213-4812-8554-3FD540AD496B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFD70582-2213-4812-8554-3FD540AD496B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {41BD5096-0062-4BD4-99AE-E7B7D9FB6891}
+	EndGlobalSection
+EndGlobal

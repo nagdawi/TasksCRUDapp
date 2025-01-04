@@ -1,0 +1,109 @@
+﻿@page
+@model TasksCRUDapp.Pages.TasksModel
+@using Microsoft.Data.SqlClient
+
+@{
+
+    string errorMessage = TasksModel.errorMessage;
+
+    // Variables
+    List<dynamic> tasks = new List<dynamic>();
+
+
+
+    // Fetch tasks from database
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(TasksModel.connectionString))
+        {
+            connection.Open();
+            string query = "SELECT * FROM Tasks";
+            SqlCommand command = new SqlCommand(query, connection);
+            DateTime taskdate;
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    taskdate = (DateTime)reader["date"];                    
+                    
+                    tasks.Add(new {
+                        Id = reader["Id"],
+                        Description = reader["description"],
+                        Date = taskdate.ToString("yyyy-MM-dd"),
+                        Complete = reader["is_complete"]
+                    });
+                
+                
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        errorMessage = ex.Message;
+    }
+    //ok
+    int x;
+    
+    x = tasks.Count;
+
+   
+}
+
+<h1>Task Management</h1>
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="error">Error: @errorMessage</div>
+}
+
+<!-- Task List -->
+<table border="1">
+    <tr>
+        <th style="width:4vw;">ID</th>
+        <th style="width:9vw;">Description</th>
+        <th style ="width:6vw;">Date</th>
+        <th style="width:6vw;text-align: center;">Complete</th>
+        <th style="width:6vw;text-align: center;">Actions</th>
+    </tr>
+    @foreach (var task in tasks)
+    {
+        DateTime taskDate = DateTime.Parse(task.Date);
+        <tr>
+            <td>@task.Id</td>
+            <td>@task.Description</td>
+            <td>@taskDate.ToShortDateString()</td>
+            <td style="text-align: center;">
+                @* @task.Complete *@
+                <form method="post">
+                    <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") disabled/>
+                </form>
+            </td>
+            <!--action column -->
+            <td style="text-align: center;">
+                <form method="post">
+                   <input type="hidden" name="id" value="@task.Id" />
+                   @*  
+                    <input type="text" name="description" value="@task.Description" />
+                    <input type="date" name="date" value="@task.Date" />
+                    <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") /> 
+                   <button type="submit" name="action" value="update">Update</button> *@
+                    <button type="submit" name="action" value="delete">Delete</button>
+                </form>
+            </td>
+        </tr>
+    
+    }
+</table>
+
+<!-- Add Task Form -->
+<h2>Add New Task</h2>
+<form method="post">
+    <label>Description:</label>
+    <input type="text" name="description" required />
+    
+    <label>Date:</label>
+    <input type="date" name="date" required />
+    <label>Complete:</label>
+    <input type="checkbox" name="complete" />
+    <button type="submit" name="action" value="add">Add Task</button>
+</form>

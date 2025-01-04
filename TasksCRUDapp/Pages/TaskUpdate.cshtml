@@ -1,0 +1,98 @@
+﻿@page
+@model TasksCRUDapp.Pages.TaskUpdateModel
+@using Microsoft.Data.SqlClient
+
+@{
+
+    string errorMessage = TasksModel.errorMessage;
+
+    // Variables
+    List<dynamic> tasks = new List<dynamic>();
+
+
+
+    // Fetch tasks from database
+    try
+    {
+        using (SqlConnection connection = new SqlConnection(TasksModel.connectionString))
+        {
+            connection.Open();
+            string query = "SELECT * FROM Tasks";
+            SqlCommand command = new SqlCommand(query, connection);
+            DateTime taskdate;
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    taskdate = (DateTime)reader["date"];                    
+                    
+                    tasks.Add(new {
+                        Id = reader["Id"],
+                        Description = reader["description"],
+                        Date = taskdate.ToString("yyyy-MM-dd"),
+                        Complete = reader["is_complete"]
+                    });
+                
+                
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        errorMessage = ex.Message;
+    }
+    //ok
+    int x;
+    
+    x = tasks.Count;
+
+   
+}
+
+<h1>Task Management Update</h1>
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="error">Error: @errorMessage</div>
+}
+
+<!-- Task List -->
+
+<table border="1">
+    <tr>
+        <th style="width:4vw;">ID</th>
+        <th>Description</th>
+        <th>Date</th>
+        <th style="text-align: center;">Complete</th>
+        <th style="text-align: center;">Actions</th>
+    </tr>
+    @foreach (var task in tasks)
+    {
+        <form method="post">
+        @{DateTime taskDate = DateTime.Parse(task.Date);}
+        <tr>
+            <td>@task.Id</td>     
+            <!--action column -->
+                <td width="50px">
+                    <input type="hidden" name="id" value="@task.Id" />
+                    <input type="text" name="description" value="@task.Description" />
+                </td>
+                <td>
+                    <input type="date" name="date" value="@task.Date" />
+                </td>
+                <td style="text-align: center;">
+                    <input type="checkbox" name="complete" @(task.Complete ? "checked" : "") />
+                </td>
+                <td style="text-align: center;">
+                    <button type="submit" name="action" value="update">Update</button>
+
+                </td>
+        </tr>
+        </form>
+
+    
+    }
+
+</table>
+
+
